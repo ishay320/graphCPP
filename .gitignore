@@ -1,0 +1,4 @@
+run
+main.o
+graph.o
+.vscode
