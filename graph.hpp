@@ -15,7 +15,6 @@ public:
     int getID();
     std::string getData();
     std::string setData(std::string data);
-    ~node();
 };
 
 class edge
@@ -31,7 +30,6 @@ public:
     int getToID() const;
     double getLength() const;
     double setLength(double len);
-    ~edge();
 };
 
 class graph
@@ -40,8 +38,9 @@ private:
     std::map<int, node> *nodes;
     std::multimap<int, edge> *edgeFrom;
     std::multimap<int, edge> *edgeTo;
-    int currentID;
-
+    uint currentID;
+    uint mc;
+    uint edgeCount;
 public:
     /**
     * @brief Construct a new graph object
@@ -95,6 +94,15 @@ public:
     node getNode(int ID) const;
 
     /**
+     * @brief checks if node exist
+     * 
+     * @param id 
+     * @return true 
+     * @return false 
+     */
+    bool nodeExist(int id) const;
+    
+    /**
      * @brief Get the Edge object
      * 
      * @param fromID 
@@ -102,7 +110,51 @@ public:
      * @return edge 
      */
     edge getEdge(int fromID, int toID) const;
-    std::vector<int> getNodesConnected(int id)const;
+    
+    /**
+     * @brief check if edge exist
+     * 
+     * @param fromID 
+     * @param toID 
+     * @return true 
+     * @return false 
+     */
+    bool edgeExist(int fromID, int toID) const;
+
+    /**
+     * @brief Get the Nodes Connected to input node
+     * 
+     * @param id 
+     * @return std::vector<int> 
+     */
+    std::vector<int> getNodesConnected(int id) const;
+
+    /**
+     * @brief get modification count
+     * 
+     * @return uint 
+     */
+    uint getMC()const;
+
+    /**
+     * @brief Get the Node Count
+     * 
+     * @return uint 
+     */
+    uint getNodeCount()const;
+
+    /**
+     * @brief Get the Edge Count
+     * 
+     * @return uint 
+     */
+    uint getEdgeCount()const;
+
+    /**
+     * @brief print graph
+     * 
+     */
+    void print()const;
     double dfs();
     //bfs
     //diextra

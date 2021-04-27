@@ -62,10 +62,13 @@ graph::graph()
     nodes = new std::map<int, node>;
     edgeFrom = new std::multimap<int, edge>;
     edgeTo = new std::multimap<int, edge>;
+    mc = 0;
+    edgeCount = 0;
 }
 int graph::addNode()
 {
     nodes->insert({currentID, node(currentID)});
+    ++mc;
     return currentID++;
 }
 bool graph::connect(int fromID, int toID, double length)
@@ -91,12 +94,15 @@ bool graph::connect(int fromID, int toID, double length)
         for (; et->second.getFromID() != fromID; ++et)
             ;
         et->second.setLength(length);
+        ++mc;
         return true;
     }
     //make new edge
     edge tmp{fromID, toID, length};
     edgeFrom->insert({fromID, tmp});
     edgeTo->insert({toID, tmp});
+    ++mc;
+    ++edgeCount;
     return true;
 }
 bool graph::removeNode(int ID)
@@ -107,12 +113,13 @@ bool graph::removeNode(int ID)
         return false;
     }
     auto list = getNodesConnected(ID);
-    for (int i = 0; i < list.capacity(); i++)
+    for (long unsigned int i = 0; i < list.capacity(); i++)
     {
         removeEdge(ID, list.at(i));
         removeEdge(list.at(i), ID);
     }
     nodes->erase(nodes->find(ID));
+    ++mc;
     return true;
 }
 bool graph::removeEdge(int fromID, int toID)
@@ -139,20 +146,33 @@ bool graph::removeEdge(int fromID, int toID)
         for (; et->second.getFromID() != fromID; ++et)
             ;
         edgeTo->erase(et);
+        ++mc;
+        --edgeCount;
         return true;
     }
     return false;
 }
-node graph::getNode(int ID) const ///need to check if second is null
+node graph::getNode(int ID) const
 {
     auto tmp = nodes->find(ID);
     if (tmp == nodes->end())
     {
-        return NULL;
+        throw "no such node";
     }
 
     return nodes->find(ID)->second;
 }
+bool graph::nodeExist(int id) const
+{
+    auto tmp = nodes->find(id);
+    if (tmp == nodes->end())
+    {
+        return false;
+    }
+
+    return true;
+}
+
 edge graph::getEdge(int fromID, int toID) const
 {
     auto ef = edgeFrom->find(fromID);
@@ -164,10 +184,23 @@ edge graph::getEdge(int fromID, int toID) const
             ;
         return ef->second;
     }
-    return NULL;
+    throw "no such edge";
 }
+bool graph::edgeExist(int fromID, int toID) const
+{
+    auto ef = edgeFrom->find(fromID);
+    auto et = edgeTo->find(toID);
+    if (ef != edgeFrom->end() &&
+        et != edgeTo->end())
+    {
+        return true;
+    }
+    return false;
+}
+
 double graph::dfs()
 {
+    return 1;
 }
 std::vector<int> graph::getNodesConnected(int id) const
 {
@@ -183,6 +216,31 @@ std::vector<int> graph::getNodesConnected(int id) const
         list.push_back(i->second.getToID());
     }
     return list;
+}
+uint graph::getMC() const
+{
+    return mc;
+}
+uint graph::getNodeCount() const
+{
+    return nodes->size();
+}
+uint graph::getEdgeCount() const
+{
+    return edgeCount;
+}
+void graph::print() const
+{
+    for (auto i = nodes->begin(); i != nodes->end(); ++i)
+    {
+        std::cout << " id: " << i->first << " data: " << i->second.getData();
+    }
+    std::cout << std::endl;
+    for (auto i = edgeFrom->begin(); i != edgeFrom->end(); ++i)
+    {
+        std::cout << " from: " << i->first << " to: " << i->second.getToID() << " len: " << i->second.getLength();
+    }
+    std::cout << std::endl;
 }
 
 graph::~graph()
